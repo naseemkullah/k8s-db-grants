@@ -1,0 +1,35 @@
+mysql:
+- host: mysql-host-1
+  port: 3306
+  k8sSecret: mysql1-admin-credentials
+  k8sNamespace: namespace-where-secret-exists
+  grants:
+  - k8sSecret: db1-admin-credentials
+    k8sNamespace: namespace-where-secret-exists
+    db: db1
+    host: "%"
+
+  - k8sSecret: db2-admin-credentials
+    k8sNamespace: namespace-where-secret-exists
+    db: db2
+    host: "%"
+
+- host: mysql-host-2
+  port: 3307
+  k8sSecret: mysql2-admin-credentials
+  k8sNamespace: namespace-where-secret-exists
+  grants:
+  - k8sSecret: db3-admin-credentials
+    k8sNamespace: namespace-where-secret-exists
+    db: db3
+    host: cloudsqlproxy~%
+
+postgresql:
+- host: postgresql-host
+  port: 5432
+  k8sSecret: postgres-admin-credentials
+  k8sNamespace: namespace-where-secret-exists
+  grants:
+  - k8sSecret: db4-admin-credentials
+    k8sNamespace: namespace-where-secret-exists
+    db: db4

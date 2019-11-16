@@ -5,19 +5,24 @@
   "main": "index.js",
   "scripts": {
     "start": "nodemon index.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "fix": "node_modules/.bin/eslint . --fix",
+    "lint": "node_modules/.bin/eslint ."
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
     "js-yaml": "^3.13.1",
-    "kubernetes-client": "^8.3.1",
+    "kubernetes-client": "^8.3.6",
     "mysql": "^2.17.1",
-    "pg": "^7.11.0",
+    "pg": "^7.17.0",
     "pg-format": "^1.0.4",
-    "pino": "^5.12.6"
+    "pino": "^5.15.0"
   },
   "devDependencies": {
-    "pino-pretty": "^3.2.0"
+    "eslint": "^6.8.0",
+    "eslint-config-airbnb-base": "^14.0.0",
+    "eslint-plugin-import": "^2.19.1",
+    "pino-pretty": "^3.5.0"
   }
 }

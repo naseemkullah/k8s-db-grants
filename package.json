@@ -4,14 +4,21 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon index.js",
+    "start": "npm run compile && nodemon build/src/index.js",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "fix": "node_modules/.bin/eslint . --fix",
-    "lint": "node_modules/.bin/eslint ."
+    "fix": "gts fix",
+    "lint": "node_modules/.bin/eslint .",
+    "check": "gts check",
+    "clean": "gts clean",
+    "compile": "tsc",
+    "prepare": "npm run compile",
+    "pretest": "npm run compile",
+    "posttest": "npm run check"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@kubernetes/client-node": "^0.11.1",
     "js-yaml": "^3.13.1",
     "kubernetes-client": "^8.3.7",
     "mysql": "^2.18.1",
@@ -20,9 +27,16 @@
     "pino": "^6.2.0"
   },
   "devDependencies": {
+    "@types/mysql": "^2.15.9",
+    "@types/node": "^13.11.1",
+    "@types/pg": "^7.14.3",
+    "@types/pg-format": "^1.0.0",
+    "@types/pino": "^5.17.0",
     "eslint": "^6.8.0",
     "eslint-config-airbnb-base": "^14.1.0",
     "eslint-plugin-import": "^2.20.2",
-    "pino-pretty": "^4.0.0"
+    "gts": "^2.0.0",
+    "pino-pretty": "^4.0.0",
+    "typescript": "~3.8.3"
   }
 }

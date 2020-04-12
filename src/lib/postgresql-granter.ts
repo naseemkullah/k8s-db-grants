@@ -1,15 +1,19 @@
 /* eslint-disable no-restricted-syntax */
 /* eslint-disable no-await-in-loop */
-const { Client } = require('pg');
-const format = require('pg-format');
-const { logger } = require('./logger');
-const k8sSecretDecrypter = require('./k8s-secret-decrypter');
+import {Client} from 'pg';
+import * as format from 'pg-format';
+import logger from './logger';
+import k8sSecretDecrypter from './k8s-secret-decrypter';
 
-async function createGrants(client, grants) {
+async function createGrants(client: Client, grants: any) {
   client.connect();
   for (const grant of grants) {
-    const [username, password] = await k8sSecretDecrypter(grant.k8sSecret, grant.k8sNamespace);
-    const roleCreationSql = format(`
+    const [username, password] = await k8sSecretDecrypter(
+      grant.k8sSecret,
+      grant.k8sNamespace
+    );
+    const roleCreationSql = format(
+      `
       DO $$
       BEGIN
         CREATE ROLE %I WITH LOGIN PASSWORD %L;
@@ -17,8 +21,16 @@ async function createGrants(client, grants) {
         RAISE NOTICE %L;
       END
       $$;
-      `, username, password, `not creating role ${username} -- it already exists`);
-    const grantSql = format('GRANT ALL PRIVILEGES ON DATABASE %I TO %I', grant.db, username);
+      `,
+      username,
+      password,
+      `not creating role ${username} -- it already exists`
+    );
+    const grantSql = format(
+      'GRANT ALL PRIVILEGES ON DATABASE %I TO %I',
+      grant.db,
+      username
+    );
     try {
       await client.query(roleCreationSql);
       await client.query(grantSql);
@@ -29,23 +41,23 @@ async function createGrants(client, grants) {
   client.end();
 }
 
-module.exports = async (instances) => {
+export default async (instances: any) => {
   for (const instance of instances) {
     const [username, password] = await k8sSecretDecrypter(
       instance.k8sSecret,
-      instance.k8sNamespace,
+      instance.k8sNamespace
     );
     const client = new Client({
       host: instance.host || 'localhost',
       port: instance.port || 5432,
       user: username || 'postgres',
       database: 'postgres',
-      password: password || null,
+      password,
     });
     try {
       await createGrants(client, instance.grants);
     } catch (error) {
-      logger.error({ error }, error);
+      logger.error({error}, error);
     }
   }
 };

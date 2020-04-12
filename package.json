@@ -2,27 +2,37 @@
   "name": "k8s-db-grants",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "build/src/index.js",
   "scripts": {
-    "start": "nodemon index.js",
+    "start": "node build/src/index.js",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "fix": "node_modules/.bin/eslint . --fix",
-    "lint": "node_modules/.bin/eslint ."
+    "fix": "gts fix",
+    "lint": "gts lint",
+    "check": "gts check",
+    "clean": "gts clean",
+    "compile": "tsc",
+    "prepare": "npm run compile",
+    "pretest": "npm run compile",
+    "posttest": "npm run lint"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "js-yaml": "^3.13.1",
-    "kubernetes-client": "^8.3.7",
+    "js-yaml": "^3.14.0",
+    "kubernetes-client": "^9.0.0",
     "mysql": "^2.18.1",
-    "pg": "^8.0.2",
+    "pg": "^8.5.1",
     "pg-format": "^1.0.4",
-    "pino": "^6.2.0"
+    "pino": "^6.7.0"
   },
   "devDependencies": {
-    "eslint": "^6.8.0",
-    "eslint-config-airbnb-base": "^14.1.0",
-    "eslint-plugin-import": "^2.20.2",
-    "pino-pretty": "^4.0.0"
+    "@types/mysql": "^2.15.15",
+    "@types/node": "^14.14.10",
+    "@types/pg": "^7.14.7",
+    "@types/pg-format": "^1.0.1",
+    "@types/pino": "^6.3.4",
+    "gts": "^3.0.2",
+    "pino-pretty": "^4.3.0",
+    "typescript": "~4.1.2"
   }
 }

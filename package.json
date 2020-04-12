@@ -13,16 +13,16 @@
   "license": "ISC",
   "dependencies": {
     "js-yaml": "^3.13.1",
-    "kubernetes-client": "^8.3.6",
-    "mysql": "^2.17.1",
-    "pg": "^7.17.0",
+    "kubernetes-client": "^8.3.7",
+    "mysql": "^2.18.1",
+    "pg": "^8.0.2",
     "pg-format": "^1.0.4",
-    "pino": "^5.15.0"
+    "pino": "^6.2.0"
   },
   "devDependencies": {
     "eslint": "^6.8.0",
-    "eslint-config-airbnb-base": "^14.0.0",
-    "eslint-plugin-import": "^2.19.1",
-    "pino-pretty": "^3.5.0"
+    "eslint-config-airbnb-base": "^14.1.0",
+    "eslint-plugin-import": "^2.20.2",
+    "pino-pretty": "^4.0.0"
   }
 }

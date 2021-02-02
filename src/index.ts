@@ -5,7 +5,8 @@ import mysqlGranter from './lib/mysql-granter';
 import postgresqlGranter from './lib/postgresql-granter';
 
 (async () => {
-  const grantsFile = yaml.load(await fs.readFile('grants.yaml', 'utf8'));
+  const grantsFilePath = process.argv[2] ?? 'grants.yaml';
+  const grantsFile = yaml.load(await fs.readFile(grantsFilePath, 'utf8'));
 
   if (!grantsFile || typeof grantsFile !== 'object') {
     throw new Error('Invalid file.');

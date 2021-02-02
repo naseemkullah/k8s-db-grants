@@ -1,8 +1,6 @@
-/* eslint-disable no-await-in-loop */
-/* eslint-disable no-restricted-syntax */
 import * as util from 'util';
 import * as mysql from 'mysql';
-import logger from './logger';
+import {logger} from './logger';
 import k8sSecretDecrypter from './k8s-secret-decrypter';
 
 async function createGrants(connection: mysql.Connection, grants: any) {

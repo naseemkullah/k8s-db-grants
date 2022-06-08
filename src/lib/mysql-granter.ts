@@ -4,9 +4,10 @@ import {logger} from './logger';
 import k8sSecretDecrypter from './k8s-secret-decrypter';
 
 async function createGrants(connection: mysql.Connection, grants: any) {
+  const connect = util.promisify(connection.connect).bind(connection);
   const query = util.promisify(connection.query).bind(connection);
 
-  connection.connect();
+  await connect();
   for (const grant of grants) {
     const [username, password] = await k8sSecretDecrypter(
       grant.k8sSecret,
@@ -17,8 +18,8 @@ async function createGrants(connection: mysql.Connection, grants: any) {
       const inserts = [grant.db, username, grant.host, password];
       const formattedSql = mysql.format(sql, inserts);
       await query(formattedSql);
-    } catch (error) {
-      logger.error({error}, error);
+    } catch (err) {
+      logger.error({err});
     }
   }
   connection.end();
@@ -38,8 +39,8 @@ export default async (instances: any) => {
     });
     try {
       await createGrants(connection, instance.grants);
-    } catch (error) {
-      logger.error({error}, error);
+    } catch (err) {
+      logger.error({err});
     }
   }
 };

@@ -6,7 +6,6 @@ import {logger} from './logger';
 import k8sSecretDecrypter from './k8s-secret-decrypter';
 
 async function createGrants(client: Client, grants: any) {
-  client.connect().catch(e => logger.error(e));
   for (const grant of grants) {
     const [username, password] = await k8sSecretDecrypter(
       grant.k8sSecret,
@@ -35,9 +34,7 @@ async function createGrants(client: Client, grants: any) {
       await client.query(roleCreationSql);
       await client.query(grantSql);
     } catch (err) {
-      logger.error(err);
-    } finally {
-      client.end().catch(err => logger.error(err));
+      logger.error({err});
     }
   }
 }
@@ -56,9 +53,11 @@ export default async (instances: any) => {
       password,
     });
     try {
+      await client.connect();
       await createGrants(client, instance.grants);
-    } catch (error) {
-      logger.error({error}, error);
+      await client.end();
+    } catch (err) {
+      logger.error({err});
     }
   }
 };

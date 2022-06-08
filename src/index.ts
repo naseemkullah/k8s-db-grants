@@ -25,4 +25,4 @@ import postgresqlGranter from './lib/postgresql-granter';
   } else {
     await postgresqlGranter(postgresqlGrants);
   }
-})().catch(err => logger.error(err));
+})().catch(err => logger.error({err}));

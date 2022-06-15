@@ -1,46 +1,37 @@
-import * as util from 'util';
-import * as mysql from 'mysql';
-import {logger} from './logger';
-import k8sSecretDecrypter from './k8s-secret-decrypter';
+import * as mysql from 'mysql2/promise';
+import {decryptK8sSecret} from './k8s-secret-decrypter';
+import {SqlInstance} from './type';
 
-async function createGrants(connection: mysql.Connection, grants: any) {
-  const connect = util.promisify(connection.connect).bind(connection);
-  const query = util.promisify(connection.query).bind(connection);
-
-  await connect();
-  for (const grant of grants) {
-    const [username, password] = await k8sSecretDecrypter(
-      grant.k8sSecret,
-      grant.k8sNamespace
-    );
-    try {
-      const sql = 'GRANT ALL PRIVILEGES ON ??.* TO ?@? identified by ?';
-      const inserts = [grant.db, username, grant.host, password];
-      const formattedSql = mysql.format(sql, inserts);
-      await query(formattedSql);
-    } catch (err) {
-      logger.error({err});
-    }
-  }
-  connection.end();
-}
-
-export default async (instances: any) => {
+export default async (instances: SqlInstance[]) => {
   for (const instance of instances) {
-    const [username, password] = await k8sSecretDecrypter(
-      instance.k8sSecret,
-      instance.k8sNamespace
-    );
-    const connection = mysql.createConnection({
+    const {username, password} = await decryptK8sSecret({
+      secret: instance.k8sSecret,
+      namespace: instance.k8sNamespace,
+    });
+    const connection = await mysql.createConnection({
       host: instance.host || 'localhost',
       port: instance.port || 3306,
       user: username || 'root',
       password,
     });
-    try {
-      await createGrants(connection, instance.grants);
-    } catch (err) {
-      logger.error({err});
+    for (const grant of instance.grants) {
+      const {username, password} = await decryptK8sSecret({
+        secret: grant.k8sSecret,
+        namespace: grant.k8sNamespace,
+      });
+
+      await connection.query('CREATE USER IF NOT EXISTS ?@? IDENTIFIED BY ?;', [
+        username,
+        grant.host,
+        password,
+      ]);
+
+      await connection.query('GRANT ALL ON ??.* TO ?@?;', [
+        grant.db,
+        username,
+        grant.host,
+      ]);
     }
+    await connection.end();
   }
 };

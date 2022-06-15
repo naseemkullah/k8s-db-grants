@@ -1,28 +1,41 @@
-import * as yaml from 'js-yaml';
+import Ajv from 'ajv';
 import {promises as fs} from 'fs';
+import * as yaml from 'js-yaml';
+import {exit} from 'process';
 import {logger} from './lib/logger';
 import mysqlGranter from './lib/mysql-granter';
 import postgresqlGranter from './lib/postgresql-granter';
+import * as schema from './lib/schema.json';
+import {GrantsFile} from './lib/type';
 
 (async () => {
   const grantsFilePath = process.argv[2] ?? 'grants.yaml';
-  const grantsFile = yaml.load(await fs.readFile(grantsFilePath, 'utf8'));
+  const grants = yaml.load(
+    await fs.readFile(grantsFilePath, 'utf8')
+  ) as GrantsFile;
+  const ajv = new Ajv({logger});
 
-  if (!grantsFile || typeof grantsFile !== 'object') {
-    throw new Error('Invalid file.');
+  const validate = ajv.compile(schema);
+
+  const valid = validate(grants);
+
+  if (!valid) {
+    const validationError = new Error('Invalid grants file');
+    (validationError as Error & {errors: typeof validate.errors}).errors =
+      validate.errors;
+    throw validationError;
   }
 
-  const {mysql: mysqlGrants, postgresql: postgresqlGrants} = grantsFile as any;
+  const {mysql: mysqlGrants, postgresql: postgresqlGrants} = grants;
 
-  if (!Array.isArray(mysqlGrants) || !mysqlGrants.length) {
-    logger.info('No mysql privileges to grant');
-  } else {
+  if (mysqlGrants?.length > 0) {
     await mysqlGranter(mysqlGrants);
   }
 
-  if (!Array.isArray(postgresqlGrants) || !postgresqlGrants.length) {
-    logger.info('No postgresql privileges to grant');
-  } else {
+  if (postgresqlGrants?.length > 0) {
     await postgresqlGranter(postgresqlGrants);
   }
-})().catch(err => logger.error({err}));
+})().catch(err => {
+  logger.fatal({err});
+  exit(1);
+});

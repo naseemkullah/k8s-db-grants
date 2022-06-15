@@ -1,6 +1,12 @@
-import * as pino from 'pino';
+import pino from 'pino';
 
 export const logger = pino({
   name: 'k8s-db-grants',
-  prettyPrint: true,
+  customLevels: {
+    log: 30,
+  },
+  transport: {
+    target: 'pino-pretty',
+    options: {translateTime: true},
+  },
 });

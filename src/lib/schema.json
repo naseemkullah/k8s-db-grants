@@ -1,0 +1,67 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "mysql": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/SqlInstance"
+      }
+    },
+    "postgresql": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/SqlInstance"
+      }
+    }
+  },
+  "required": ["mysql", "postgresql"],
+  "definitions": {
+    "SqlInstance": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "host": {
+          "type": "string"
+        },
+        "port": {
+          "type": "integer"
+        },
+        "k8sSecret": {
+          "type": "string"
+        },
+        "k8sNamespace": {
+          "type": "string"
+        },
+        "grants": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Grant"
+          }
+        }
+      },
+      "required": ["grants", "host", "k8sNamespace", "k8sSecret", "port"],
+      "title": "SqlInstance"
+    },
+    "Grant": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "k8sSecret": {
+          "type": "string"
+        },
+        "k8sNamespace": {
+          "type": "string"
+        },
+        "db": {
+          "type": "string"
+        },
+        "host": {
+          "type": "string"
+        }
+      },
+      "required": ["db", "k8sNamespace", "k8sSecret"],
+      "title": "Grant"
+    }
+  }
+}
